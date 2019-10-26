@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+    .node {
+      font: 10px sans-serif;
+    }
+
+    .link {
+      stroke: steelblue;
+      stroke-opacity: 0.5;
+      fill: none;
+      pointer-events: none;
+    }
+
+    #chart {
+      position: fixed;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="chart" ondragover="dragoverHandler(event)" ondrop="loadFile(event)"></div>
+  <script>
+    function dragoverHandler(evt) {
+      evt.stopPropagation();
+      evt.preventDefault();
+      evt.dataTransfer.dropEffect = 'copy';
+    }
+
+    function loadFile(event) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      var reader = new FileReader();
+      reader.onload = (loadEvent) => this.loadCSV(loadEvent.target.result);
+      reader.readAsText(event.dataTransfer.files[0]);
+    }
+
+    function loadCSV(csvString) {
+      var diameter = 960;
+      var radius = diameter / 2;
+      var innerRadius = radius - 120;
+
+      var cluster = d3.cluster()
+        .size([360, innerRadius]);
+
+      var line = d3.radialLine()
+        .curve(d3.curveBundle.beta(0.85))
+        .radius(d => d.y)
+        .angle(d => d.x / 180 * Math.PI);
+
+      var chartDiv = document.getElementById("chart");
+
+      var svg = d3.select(chartDiv).append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%");
+      var g = svg.append("g");
+
+      svg.call(d3.zoom()
+        .extent([
+          [0, 0],
+          [diameter, diameter]
+        ])
+        .scaleExtent([0.1, 8])
+        .on("zoom", zoomed));
+
+      function zoomed() {
+        g.attr("transform", d3.event.transform);
+      }
+
+      var link = g.append("g").selectAll(".link"),
+        node = g.append("g").selectAll(".node");
+
+      csvData = d3.csvParse(csvString);
+
+      var classes = toJson(csvData);
+
+      var root = packageHierarchy(classes);
+
+      cluster(root);
+
+      link = link
+        .data(packageImports(root.leaves()))
+        .enter().append("path")
+        .each(d => {
+          d.source = d[0];
+          d.target = d[d.length - 1];
+        })
+        .attr("class", "link")
+        .attr("d", line);
+
+      node = node
+        .data(root.leaves())
+        .enter().append("text")
+        .attr("class", "node")
+        .attr("dy", "0.31em")
+        .attr("transform", d => "rotate(" + (d.x - 90) + ") translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)"))
+        .attr("text-anchor", d => d.x < 180 ? "start" : "end")
+        .text(d => d.data.name);
+    }
+
+    function toJson(data) {
+      var map = {};
+
+      data.forEach(r => {
+        var entry = map[r.source];
+        if (!entry) {
+          entry = map[r.source] = {
+            name: r.source,
+            imports: []
+          };
+        }
+        entry.imports.push(r.target);
+        if (!map[r.target]) {
+          map[r.target] = {
+            name: r.target,
+            imports: []
+          };
+        }
+      });
+
+      return Object.values(map);
+    }
+
+    function packageHierarchy(classes) {
+      var map = {};
+
+      function find(name, data) {
+        var node = map[name];
+        if (!node) {
+          node = map[name] = data || {
+            name: name,
+            children: []
+          };
+          if (name.length) {
+            var i = name.lastIndexOf(".");
+            node.parent = find(name.substring(0, i).toLowerCase());
+            node.parent.children.push(node);
+          }
+        }
+        return node;
+      }
+
+      classes.forEach(function (d) {
+        find(d.name, d);
+      });
+
+      return d3.hierarchy(map[""]);
+    }
+
+    function packageImports(nodes) {
+      var map = {},
+        imports = [];
+
+      nodes.forEach(function (d) {
+        map[d.data.name] = d;
+      });
+
+      nodes.forEach(function (d) {
+        if (d.data.imports) d.data.imports.forEach(function (i) {
+          imports.push(map[d.data.name].path(map[i]));
+        });
+      });
+
+      return imports;
+    }
+  </script>
+
+</html>

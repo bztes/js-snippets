@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+    body {
+      font: 12px sans-serif;
+    }
+
+    .refs {
+      fill-opacity: 0.67;
+    }
+
+    #chart {
+      position: fixed;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+    }
+
+    .menu {
+      position: absolute;
+      z-index: 100;
+      left: 10px;
+      top: 10px;
+      border: 1px solid #eee;
+      padding: 6px;
+      opacity: 0.8;
+      background: #fcfcfc;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="menu">
+    <input type="checkbox" id="incommingButton" onclick="onModelChanged()">Show Incoming</input>
+  </div>
+  <div ondragover="dragoverHandler(event)" ondrop="loadFile(event)" id="chart"></div>
+  <script>
+    var chartDiv = document.getElementById("chart");
+    var svg = d3.select(chartDiv).append("svg");
+
+    var matrix = {};
+
+    function dragoverHandler(evt) {
+      evt.stopPropagation();
+      evt.preventDefault();
+      evt.dataTransfer.dropEffect = 'copy';
+    }
+
+    function loadFile(event) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      var reader = new FileReader();
+      reader.onload = (loadEvent) => this.loadCSV(loadEvent.target.result);
+      reader.readAsText(event.dataTransfer.files[0]);
+    }
+
+    function loadCSV(csvString) {
+      data = getModelFromCSV(d3.csvParse(csvString));
+
+      onModelChanged();
+    }
+
+    function getModelFromCSV(csv) {
+      var indexByName = {};
+      var size = 0;
+      csv.forEach(r => {
+        [r.source, r.target].forEach(n => {
+          if (!(n in indexByName)) {
+            indexByName[n] = size++;
+          }
+        });
+      });
+
+      var matrix = Array(size).fill().map(() => Array(size).fill(0));
+      csv.forEach(r => matrix[indexByName[r.source]][indexByName[r.target]] = 1);
+
+      return {
+        nodes: Object.keys(indexByName),
+        matrix: matrix
+      };
+    }
+
+    function transform(matrix) {
+      return matrix.reduce((r, a) => a.map((v, i) => [...(r[i] || []), v]), []);
+    }
+
+    var padding = 100;
+
+    var chord = d3.chord()
+      .padAngle(0.024)
+      .sortSubgroups(d3.descending);
+
+    var color = d3.scaleSequential()
+      .domain([0, Math.PI * 2])
+      .interpolator(d3.interpolateRainbow);
+
+    var g = svg.append("g");
+    var compsGroup = g.append("g").attr("class", "compsGroup");
+    var refsGroup = g.append("g").attr("class", "refs");
+
+    var diameter = 960;
+
+    svg.call(d3.zoom()
+      .extent([
+        [0, 0],
+        [diameter, diameter]
+      ])
+      .scaleExtent([0.1, 8])
+      .on("zoom", zoomed));
+
+    function zoomed() {
+      g.attr("transform", d3.event.transform);
+    }
+
+
+    function onModelChanged() {
+      matrix = document.getElementById("incommingButton").checked ? transform(data.matrix) : data.matrix;
+      redraw();
+    }
+
+    function redraw() {
+      var chords = chord(matrix);
+
+      var outerRadius = diameter * 0.5 - padding;
+      var innerRadius = outerRadius - 30;
+
+      svg.attr("width", "100%")
+        .attr("height", "100%");
+
+      var arc = d3.arc()
+        .innerRadius(innerRadius)
+        .outerRadius(outerRadius);
+
+      var ribbon = d3.ribbon()
+        .radius(innerRadius - 5);
+
+      var compGroup = compsGroup.selectAll("g").data(chords.groups, d => d.index);
+
+      compGroup.exit().remove();
+
+      var compGroupEnter = compGroup.enter().append("g");
+
+      compGroupEnter.append("path").attr("class", "compPath");
+      compGroupEnter.append("text").attr("class", "compText");
+
+      compGroup = compGroup.merge(compGroupEnter);
+
+      compGroup.select(".compPath")
+        .on("mouseover", fadeComp(.1))
+        .on("mouseout", fadeComp(1))
+        .attr("d", arc)
+        .style("fill", function (d) {
+          return color(centerAngle(d));
+        })
+        .style("stroke", function (d) {
+          return d3.rgb(color(centerAngle(d))).darker();
+        });
+
+      compGroup.select(".compText")
+        .attr("transform", d => centerAngle(d) > Math.PI ?
+          "rotate(" + (centerAngle(d) / Math.PI * 180 + 90) + ") translate(-" + outerRadius + ")" :
+          "rotate(" + (centerAngle(d) / Math.PI * 180 - 90) + ") translate(" + outerRadius + ")")
+        .attr("x", d => centerAngle(d) > Math.PI ? -8 : 8)
+        .attr("dy", ".35em")
+        .style("text-anchor", d => centerAngle(d) > Math.PI ? 'end' : null)
+        .text(d => data.nodes[d.index]);
+
+      var ribbonPath = refsGroup.selectAll("path").data(chords);
+
+      ribbonPath.exit().remove();
+      ribbonPath.enter().append("path")
+        .on("mouseover", fadeRef(.1))
+        .on("mouseout", fadeRef(1))
+        .merge(ribbonPath)
+        .attr("d", ribbon)
+        .style("fill", function (d) {
+          return color(centerAngle(chords.groups[d.target.index]));
+        })
+        .style("stroke", function (d) {
+          return d3.rgb(color(centerAngle(chords.groups[d.target.index]))).darker();
+        });
+    }
+
+    function centerAngle(d) {
+      return d.startAngle + (d.endAngle - d.startAngle) / 2;
+    }
+
+    function fadeComp(opacity) {
+      return function (g) {
+        refsGroup.selectAll("path")
+          .filter(d => !(d.source.index == g.index && d.source.value != 0 || d.target.index == g.index && d.target.value != 0))
+          .style("opacity", opacity);
+        compsGroup.selectAll("g")
+          .filter(d => !(g.index == d.index || matrix[g.index][d.index] == 1))
+          .style("opacity", opacity);
+      };
+    }
+
+    function fadeRef(opacity) {
+      return function (g) {
+        refsGroup.selectAll("path")
+          .filter(d => d != g)
+          .style("opacity", opacity);
+        compsGroup.selectAll("g")
+          .filter(d => !(g.source.index == d.index || g.target.index == d.index))
+          .style("opacity", opacity);
+      };
+    }
+  </script>
+</body>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <style>
+        body {
+            font: 8px sans-serife;
+        }
+
+        #graph {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        #graph svg .links path {
+            stroke: #333333;
+            stroke-width: 1;
+            fill: none;
+        }
+
+        #graph svg .nodes circle {
+            stroke: #333333;
+            stroke-width: 1px;
+            fill: #f0f0f0;
+            r: 5px;
+        }
+
+        #graph svg .nodes text {
+            pointer-events: none;
+        }
+
+        div.tooltip {
+            position: absolute;
+            background: #3a3a3a;
+            color: #fff;
+            pointer-events: none;
+            padding: 5px;
+            margin: 10px 0 0 10px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="graph"></div>
+    <script>
+        var div = d3.select("#graph");
+
+        var tooltip = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
+
+        var boundingBox = div.node().getBoundingClientRect();
+        var width = boundingBox.width;
+        var height = boundingBox.height;
+
+        var svg = div.append("svg").attr("width", "100%").attr("height", "100%");
+        // build the arrow.
+        svg.append("svg:defs").selectAll("marker")
+            .data(["end"])
+            .enter().append("svg:marker")
+            .attr("id", String)
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refY", -0.25)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("svg:path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("fill", "#333333");
+
+        var g = svg.append("g").attr("class", "everything");
+
+        var data = { nodes: [], links: [] };
+
+        // SVG Nodes
+        var svgE = {};
+        svgE.link = g.append("g").attr("class", "links").selectAll(".link");
+        svgE.node = g.append("g").attr("class", "nodes").selectAll(".node");
+
+        // Simulation 
+        var simulation = d3.forceSimulation(data.nodes)
+            .force("link", d3.forceLink(data.links).distance(50))
+            .force("charge", d3.forceManyBody().strength(-100))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .on("tick", tickActions);
+
+        // DnD
+        var drag_handler = d3.drag()
+            .on("start", dragStart)
+            .on("drag", dragDrag)
+            .on("end", dragEnd);
+
+        // Zoom
+        var zoom_handler = d3.zoom().on("zoom", zoomActions);
+        zoom_handler(svg);
+
+        d3.interval(function () {
+            var nodesCount = 2 + getRandomInt(98);
+            var linksCount = nodesCount + getRandomInt(nodesCount);
+            load(createDummyData(nodesCount, linksCount));
+        }, 3000);
+
+        function createDummyData(nodesCount, linksCount) {
+            var data = { nodes: [], links: [] };
+
+            for (var i = 0; i < nodesCount; i++) {
+                data.nodes.push({ id: i, name: Math.random().toString(36).substring(7) });
+            }
+
+            for (var i = 0; i < linksCount; i++) {
+                data.links.push({
+                    source: getRandomInt(nodesCount),
+                    target: getRandomInt(nodesCount),
+                    value: getRandomInt(2)
+                });
+            }
+
+            return data;
+        }
+
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * Math.floor(max));
+        }
+
+        function load(jsonData) {
+            data.nodes = jsonData.nodes;
+            data.links = jsonData.links;
+            redraw();
+        }
+
+        function redraw() {
+            svgE.link = svgE.link.data(data.links, d => d.source + "-" + d.target);
+            svgE.link.exit().remove();
+            svgE.link = svgE.link.enter()
+                .append("path")
+                .attr("class", "link")
+                .attr("marker-mid", "url(#end)")
+                .merge(svgE.link);
+
+            svgE.node = svgE.node.data(data.nodes, d => d.id);
+            svgE.node.exit().remove();
+            var svgNodeEnter = svgE.node.enter()
+                .append("g")
+                .attr("class", "node");
+
+            svgNodeEnter.append("circle")
+                .on("mouseover", d => {
+                    setTooltip(d.name);
+                })
+                .on("mouseout", _ => {
+                    setTooltip(null);
+                });
+            svgNodeEnter.append("text")
+                .attr("x", 10)
+                .attr("y", 10)
+                .text(d => d.name);
+
+            svgE.node = svgNodeEnter.merge(svgE.node);
+
+            drag_handler(svgE.node);
+
+            restartSimulation();
+        }
+
+        function restartSimulation() {
+            simulation.nodes(data.nodes);
+            simulation.force("link").links(data.links);
+            simulation.alpha(1).restart();
+        }
+
+        function dragStart(d) {
+            if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        //make sure you can't drag the circle outside the box
+        function dragDrag(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+
+        function dragEnd(d) {
+            if (!d3.event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
+        function zoomActions() {
+            g.attr("transform", d3.event.transform)
+        }
+
+        function tickActions() {
+            svgE.node.attr("transform", d => `translate(${d.x},${d.y})`);
+            svgE.link.attr("d", curvedEdges);
+        }
+
+        function curvedEdges(d) {
+            var dx = d.target.x - d.source.x;
+            var dy = d.target.y - d.source.y;
+            var dr = Math.sqrt(dx * dx + dy * dy);
+            return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
+        }
+
+        function straightEdges(d) {
+            return `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`;
+        }
+
+        function setTooltip(html) {
+            if (html) {
+                tooltip.html(html)
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY) + "px")
+                    .style("opacity", 1);
+            } else {
+                tooltip.style("opacity", 0);
+            }
+        }
+    </script>
+</body>
+
+</html>
