@@ -41,17 +41,29 @@
             margin: 10px 0 0 10px;
             border-radius: 3px;
         }
+
+        div.info {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            font-size: 0.9em;
+            color: #555;
+            margin: 10px
+        }
     </style>
 </head>
 
 <body>
     <div id="graph"></div>
+    <div class="info"><b>f</b> &#8594; zoom to fit</div>
     <script>
         var nodeColors = d3.scaleOrdinal(d3.schemeCategory10);
 
         var div = d3.select("#graph");
 
         var tooltip = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
+
+        d3.select("body").on("keydown", _ => { if (d3.event.key == 'f') zoomToFit() });
 
         var boundingBox = div.node().getBoundingClientRect();
         var width = boundingBox.width;
@@ -95,17 +107,22 @@
             .on("end", dragEnd);
 
         // Zoom
-        var zoom_handler = d3.zoom().on("zoom", zoomActions);
-        zoom_handler(svg);
+        var zoomHandler = d3.zoom().on("zoom", zoomActions);
+        zoomHandler(svg);
 
-        d3.interval(function () {
+        loadRandomData();
+        d3.interval(_ => {
+            loadRandomData();
+        }, 10000);
+
+        function loadRandomData() {
             var nodesCount = 2 + getRandomInt(198);
             var linksCount = nodesCount + getRandomInt(nodesCount);
             var data = createDummyData(nodesCount, linksCount);
             createRefs(data.nodes, data.links);
             tarjan(data.nodes);
             load(data);
-        }, 5000);
+        }
 
         function createRefs(nodes, links) {
             let nodeMap = {};
@@ -288,6 +305,21 @@
             } else {
                 tooltip.style("opacity", 0);
             }
+        }
+
+        function zoomToFit(margin = 50) {
+            let bbox = g.node().getBBox();
+
+            let w = width - 2 * margin;
+            let h = height - 2 * margin;
+            let scale = Math.min(w / bbox.width, h / bbox.height);
+            let x = margin + (w - (scale * bbox.width)) / 2 - (bbox.x * scale);
+            let y = margin + (h - (scale * bbox.height)) / 2 - (bbox.y * scale);
+
+            svg.transition().duration(500).call(
+                zoomHandler.transform,
+                d3.zoomIdentity.translate(x, y).scale(scale)
+            );
         }
     </script>
 </body>
