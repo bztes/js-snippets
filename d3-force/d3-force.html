@@ -22,7 +22,7 @@ limitations under the License.
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <style>
         body {
-            font: 8px sans-serife;
+            font: 9px sans-serife;
         }
 
         #graph {
@@ -73,21 +73,32 @@ limitations under the License.
     <div id="graph"></div>
     <div class="info"><b>f</b> &#8594; zoom to fit</div>
     <script>
-        var nodeColors = d3.scaleOrdinal(d3.schemeCategory10);
+        var nodeColors;
+        var div;
+        var width;
+        var height;
+        var tooltip;
+        var data;
+        var svgE;
+        var simulation;
+        var dragHandler;
+        var zoomHandler;
 
-        var div = d3.select("#graph");
+        data = { nodes: [], links: [] };
 
-        var tooltip = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
+        nodeColors = d3.scaleOrdinal(d3.schemeCategory10);
+        div = d3.select("#graph");
+        tooltip = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
 
-        d3.select("body").on("keydown", _ => { if (d3.event.key == 'f') zoomToFit() });
+        // SVG Elements
+        svgE = {};
+        svgE.svg = div.append("svg").attr("width", "100%").attr("height", "100%");
+        svgE.g = svgE.svg.append("g").attr("class", "everything");
+        svgE.link = svgE.g.append("g").attr("class", "links").selectAll(".link");
+        svgE.node = svgE.g.append("g").attr("class", "nodes").selectAll(".node");
 
-        var boundingBox = div.node().getBoundingClientRect();
-        var width = boundingBox.width;
-        var height = boundingBox.height;
-
-        var svg = div.append("svg").attr("width", "100%").attr("height", "100%");
         // build the arrow.
-        svg.append("svg:defs").selectAll("marker")
+        svgE.svg.append("svg:defs").selectAll("marker")
             .data(["end"])
             .enter().append("svg:marker")
             .attr("id", String)
@@ -100,31 +111,27 @@ limitations under the License.
             .attr("d", "M0,-5L10,0L0,5")
             .attr("fill", "#333333");
 
-        var g = svg.append("g").attr("class", "everything");
-
-        var data = { nodes: [], links: [] };
-
-        // SVG Nodes
-        var svgE = {};
-        svgE.link = g.append("g").attr("class", "links").selectAll(".link");
-        svgE.node = g.append("g").attr("class", "nodes").selectAll(".node");
-
-        // Simulation 
-        var simulation = d3.forceSimulation(data.nodes)
-            .force("link", d3.forceLink(data.links).distance(50))
-            .force("charge", d3.forceManyBody().strength(-100))
-            .force("center", d3.forceCenter(width / 2, height / 2))
-            .on("tick", tickActions);
+        updateDim();
 
         // DnD
-        var drag_handler = d3.drag()
+        dragHandler = d3.drag()
             .on("start", dragStart)
             .on("drag", dragDrag)
             .on("end", dragEnd);
 
         // Zoom
-        var zoomHandler = d3.zoom().on("zoom", zoomActions);
-        zoomHandler(svg);
+        zoomHandler = d3.zoom().on("zoom", zoomActions);
+        zoomHandler(svgE.svg);
+
+        // Zoom To Fit
+        d3.select("body").on("keydown", _ => { if (d3.event.key == 'f') zoomToFit() });
+
+        // Simulation 
+        simulation = d3.forceSimulation(data.nodes)
+            .force("link", d3.forceLink(data.links).distance(50))
+            .force("charge", d3.forceManyBody().strength(-100))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .on("tick", tickActions);
 
         loadRandomData();
         d3.interval(_ => {
@@ -135,9 +142,29 @@ limitations under the License.
             var nodesCount = 2 + getRandomInt(198);
             var linksCount = nodesCount + getRandomInt(nodesCount);
             var data = createDummyData(nodesCount, linksCount);
-            createRefs(data.nodes, data.links);
-            tarjan(data.nodes);
             load(data);
+
+            function createDummyData(nodesCount, linksCount) {
+                var data = { nodes: [], links: [] };
+
+                for (var i = 0; i < nodesCount; i++) {
+                    data.nodes.push({ id: i, name: Math.random().toString(36).substring(7) });
+                }
+
+                for (var i = 0; i < linksCount; i++) {
+                    data.links.push({
+                        source: getRandomInt(nodesCount),
+                        target: getRandomInt(nodesCount),
+                        value: getRandomInt(2)
+                    });
+                }
+
+                return data;
+            }
+
+            function getRandomInt(max) {
+                return Math.floor(Math.random() * Math.floor(max));
+            }
         }
 
         function createRefs(nodes, links) {
@@ -198,31 +225,11 @@ limitations under the License.
             }
         }
 
-        function createDummyData(nodesCount, linksCount) {
-            var data = { nodes: [], links: [] };
-
-            for (var i = 0; i < nodesCount; i++) {
-                data.nodes.push({ id: i, name: Math.random().toString(36).substring(7) });
-            }
-
-            for (var i = 0; i < linksCount; i++) {
-                data.links.push({
-                    source: getRandomInt(nodesCount),
-                    target: getRandomInt(nodesCount),
-                    value: getRandomInt(2)
-                });
-            }
-
-            return data;
-        }
-
-        function getRandomInt(max) {
-            return Math.floor(Math.random() * Math.floor(max));
-        }
-
         function load(jsonData) {
             data.nodes = jsonData.nodes;
             data.links = jsonData.links;
+            createRefs(data.nodes, data.links);
+            tarjan(data.nodes);
             redraw();
         }
 
@@ -255,9 +262,16 @@ limitations under the License.
 
             svgE.node.select("text").text(d => d.name);
 
-            drag_handler(svgE.node);
+            dragHandler(svgE.node);
 
+            setTooltip(0);
             restartSimulation();
+        }
+
+        function updateDim() {
+            let boundingBox = div.node().getBoundingClientRect();
+            width = boundingBox.width;
+            height = boundingBox.height;
         }
 
         function restartSimulation() {
@@ -285,7 +299,7 @@ limitations under the License.
         }
 
         function zoomActions() {
-            g.attr("transform", d3.event.transform)
+            svgE.g.attr("transform", d3.event.transform)
         }
 
         function tickActions() {
@@ -324,7 +338,8 @@ limitations under the License.
         }
 
         function zoomToFit(margin = 50) {
-            let bbox = g.node().getBBox();
+            updateDim();
+            let bbox = svgE.g.node().getBBox();
 
             let w = width - 2 * margin;
             let h = height - 2 * margin;
@@ -332,7 +347,7 @@ limitations under the License.
             let x = margin + (w - (scale * bbox.width)) / 2 - (bbox.x * scale);
             let y = margin + (h - (scale * bbox.height)) / 2 - (bbox.y * scale);
 
-            svg.transition().duration(500).call(
+            svgE.svg.transition().duration(500).call(
                 zoomHandler.transform,
                 d3.zoomIdentity.translate(x, y).scale(scale)
             );
