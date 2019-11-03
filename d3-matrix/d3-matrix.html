@@ -74,6 +74,8 @@ limitations under the License.
   <div ondragover="dragoverHandler(event)" ondrop="loadFile(event)" id="chart"></div>
   <script>
     var data = {};
+    var sKey = 0;
+    var tKey = 1;
 
     var chartDiv = document.getElementById("chart");
     var svg = d3.select(chartDiv).append("svg");
@@ -89,11 +91,13 @@ limitations under the License.
     var transTime = 250;
     var childIndent = 10;
 
-    var g = svg.append("g");
-    var highlightGroup = g.append("g").attr("class", "highlightGroup");
-    var linksAxis = g.append("g").attr("class", "linksAxis").attr("transform", `translate(${headerSize}, ${headerSize})`);
-    var columnsAxis = g.append("g").attr("class", "columnsAxis").attr("transform", `translate(${headerSize}, ${headerSize - nodeSize}) rotate(-90)`);
-    var rowsAxis = g.append("g").attr("class", "rowsAxis").attr("transform", `translate(0, ${headerSize})`);
+    var svgE = {};
+    svgE.g = svg.append("g");
+    svgE.highlight = svgE.g.append("g").attr("class", "highlight");
+    svgE.links = svgE.g.append("g").attr("class", "linksAxis").attr("transform", `translate(${headerSize}, ${headerSize})`);
+    svgE.axis = [];
+    svgE.axis[sKey] = svgE.g.append("g").attr("class", "sourceAxis").attr("transform", `translate(0, ${headerSize})`);
+    svgE.axis[tKey] = svgE.g.append("g").attr("class", "targetAxis").attr("transform", `translate(${headerSize}, ${headerSize - nodeSize}) rotate(-90)`);
 
     svg.call(d3.zoom()
       .scaleExtent([0.1, 8])
@@ -124,11 +128,12 @@ limitations under the License.
 
       data.matrix = createMatrix(data.root);
 
-      data.tNodeStates = [...new Array(data.root.descCount)].map(() => ({
+      data.nodeStates = [];
+      data.nodeStates[tKey] = [...new Array(data.root.descCount)].map(() => ({
         collapsed: false,
         index: -1
       }));
-      data.sNodeStates = [...new Array(data.root.descCount)].map(() => ({
+      data.nodeStates[sKey] = [...new Array(data.root.descCount)].map(() => ({
         collapsed: false,
         index: -1
       }));
@@ -201,7 +206,7 @@ limitations under the License.
     }
 
     function zoomed() {
-      g.attr("transform", d3.event.transform);
+      svgE.g.attr("transform", d3.event.transform);
     }
 
     function toggleCollapse(nodeIndex, nodeStates) {
@@ -229,6 +234,7 @@ limitations under the License.
           var value = data.matrix[sNode.index][tNode.index];
           if (value > 0) {
             links.push({
+              id: sNode.index + "-" + tNode.index,
               source: sNode,
               target: tNode,
               sIndex: s,
@@ -284,15 +290,15 @@ limitations under the License.
       }
     }
 
-    function redrawAxis(group, nodes, nodeStates, rows) {
-      var axis = group.selectAll("g").data(nodes, d => d.index);
+    function redrawAxis(key) {
+      var axis = svgE.axis[key].selectAll("g").data(data.nodes[key], d => d.index);
       axis.exit().remove();
       var entered = axis.enter().append("g")
-        .attr("transform", d => `translate(0, ${d.parent ? nodeStates[d.parent.index].index * nodeSize : 0})`)
+        .attr("transform", d => `translate(0, ${d.parent ? data.nodeStates[key][d.parent.index].index * nodeSize : 0})`)
         .style("opacity", 0)
-        .on("mouseover", d => highlight(nodeStates[d.index].index, nodes.length, rows))
+        .on("mouseover", d => highlight(d.index, key))
         .on("mouseout", clearHighlight)
-        .on("dblclick", d => toggleCollapse(d.index, nodeStates));
+        .on("dblclick", d => toggleCollapse(d.index, data.nodeStates[key]));
       var merge = entered.merge(axis)
         .transition().duration(transTime)
         .attr("transform", (d, i) => `translate(0, ${i * nodeSize})`)
@@ -302,12 +308,12 @@ limitations under the License.
         .attr("class", "fold")
         .attr("dy", ".35em")
         .attr("x", d => d.depth * childIndent)
-        .on("mousedown", d => toggleCollapse(d.index, nodeStates));
+        .on("mousedown", d => toggleCollapse(d.index, data.nodeStates[key]));
 
       merge.select(".fold")
         .text(d => {
           if (d.children.length > 0) {
-            return nodeStates[d.index].collapsed ? "[+]" : "[-]";
+            return data.nodeStates[key][d.index].collapsed ? "[+]" : "[-]";
           }
           return null;
         });
@@ -319,22 +325,22 @@ limitations under the License.
     }
 
     function redraw() {
-      data.sNodes = treeList(data.root, data.sNodeStates);
-      data.tNodes = treeList(data.root, data.tNodeStates);
+      data.nodes = [];
+      data.nodes[sKey] = treeList(data.root, data.nodeStates[sKey]);
+      data.nodes[tKey] = treeList(data.root, data.nodeStates[tKey]);
 
-      redrawAxis(rowsAxis, data.sNodes, data.sNodeStates, true);
-      redrawAxis(columnsAxis, data.tNodes, data.tNodeStates, false);
+      redrawAxis(sKey);
+      redrawAxis(tKey);
 
-      data.links = linkList(data.sNodes, data.tNodes);
+      data.links = linkList(data.nodes[sKey], data.nodes[tKey]);
 
-      var linkCircle = linksAxis.selectAll(".link").data(data.links, d => d.sIndex + "-" + d.tIndex);
+      var linkCircle = svgE.links.selectAll(".link").data(data.links, d => d.id);
       linkCircle.exit().remove();
       linkCircle.enter().append("rect")
         .attr("class", "link")
-        .style("opacity", 0)
         .on("mouseover", d => {
-          highlight(d.sIndex, data.tNodes.length, true);
-          highlight(d.tIndex, data.sNodes.length, false);
+          highlight(d.source.index, sKey);
+          highlight(d.target.index, tKey);
           setTooltip(`<b>Source:</b> ${d.source.name}<br><b>Target:</b> ${d.target.name}<br><b>Links:</b> ${d.value}`);
         })
         .on("mouseout", _ => {
@@ -342,30 +348,37 @@ limitations under the License.
           setTooltip(null);
         })
         .on("dblclick", d => {
-          let sNodeState = data.sNodeStates[d.source.index];
+          let sNodeState = data.nodeStates[sKey][d.source.index];
           sNodeState.collapsed = !sNodeState.collapsed;
-          let tNodeState = data.tNodeStates[d.target.index];
+          let tNodeState = data.nodeStates[tKey][d.target.index];
           tNodeState.collapsed = sNodeState.collapsed;
           redraw();
         })
+        .attr("y", d => data.nodeStates[sKey][d.source.index].index * nodeSize)
+        .attr("x", d => data.nodeStates[tKey][d.target.index].index * nodeSize)
+        .style("opacity", 0)
         .merge(linkCircle)
-        .attr("x", (d, i) => d.tIndex * nodeSize)
-        .attr("y", (d, i) => d.sIndex * nodeSize)
+        .transition().duration(transTime)
+        .attr("y", d => data.nodeStates[sKey][d.source.index].index * nodeSize)
+        .attr("x", d => data.nodeStates[tKey][d.target.index].index * nodeSize)
         .transition().duration(transTime)
         .style("opacity", 1);
     }
 
-    function highlight(i, length, row) {
-      highlightGroup.append("rect")
+    function highlight(index, key) {
+      index = data.nodeStates[key][index].index;
+      let length = data.nodes[key].length;
+
+      svgE.highlight.append("rect")
         .attr("class", "selection")
-        .attr(row ? "x" : "y", 0)
-        .attr(row ? "y" : "x", headerSize + i * nodeSize - nodeSize / 2)
-        .attr(row ? "width" : "height", headerSize + length * nodeSize)
-        .attr(row ? "height" : "width", nodeSize);
+        .attr(key == sKey ? "x" : "y", 0)
+        .attr(key == sKey ? "y" : "x", headerSize + index * nodeSize - nodeSize / 2)
+        .attr(key == sKey ? "width" : "height", headerSize + length * nodeSize)
+        .attr(key == sKey ? "height" : "width", nodeSize);
     }
 
     function clearHighlight() {
-      highlightGroup.selectAll("rect").remove();
+      svgE.highlight.selectAll("rect").remove();
     }
   </script>
 </body>
