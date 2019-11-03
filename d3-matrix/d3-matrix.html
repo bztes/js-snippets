@@ -21,7 +21,7 @@ limitations under the License.
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <style>
     body {
-      font: 12px sans-serif;
+      font: 10px sans-serif;
     }
 
     #chart {
@@ -333,7 +333,7 @@ limitations under the License.
         .on("mouseover", d => {
           highlight(d.sIndex, data.tNodes.length, true);
           highlight(d.tIndex, data.sNodes.length, false);
-          setTooltip(d.value);
+          setTooltip(`<b>Source:</b> ${d.source.name}<br><b>Target:</b> ${d.target.name}<br><b>Links:</b> ${d.value}`);
         })
         .on("mouseout", _ => {
           clearHighlight();
