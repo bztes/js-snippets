@@ -21,7 +21,7 @@ limitations under the License.
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <style>
     body {
-      font: 10px sans-serif;
+      font: 10px arial, sans-serif;
     }
 
     #chart {
@@ -49,13 +49,12 @@ limitations under the License.
       transition: .25s ease;
     }
 
-    svg rect.selection {
-      fill: #eee;
+    svg text.fold {
+      cursor: pointer;
     }
 
-    svg text.fold {
-      font-weight: bold;
-      cursor: default;
+    svg rect.highlight {
+      fill: #eee;
     }
 
     div.tooltip {
@@ -367,10 +366,10 @@ limitations under the License.
 
     function highlight(index, key) {
       index = data.nodeStates[key][index].index;
-      let length = data.nodes[key].length;
+      let length = data.nodes[(key + 1) % 2].length;
 
       svgE.highlight.append("rect")
-        .attr("class", "selection")
+        .attr("class", "highlight")
         .attr(key == sKey ? "x" : "y", 0)
         .attr(key == sKey ? "y" : "x", headerSize + index * nodeSize - nodeSize / 2)
         .attr(key == sKey ? "width" : "height", headerSize + length * nodeSize)
