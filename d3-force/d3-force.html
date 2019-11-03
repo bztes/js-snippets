@@ -153,9 +153,10 @@ limitations under the License.
 
                 for (var i = 0; i < linksCount; i++) {
                     data.links.push({
+                        id: i,
                         source: getRandomInt(nodesCount),
                         target: getRandomInt(nodesCount),
-                        value: getRandomInt(2)
+                        label: getRandomInt(2)
                     });
                 }
 
@@ -176,7 +177,7 @@ limitations under the License.
                 nodeMap[node.id] = node;
             });
 
-            // add links
+            // set source/target references
             links.forEach(link => {
                 link.source = nodeMap[link.source];
                 link.target = nodeMap[link.target];
@@ -234,7 +235,7 @@ limitations under the License.
         }
 
         function redraw() {
-            svgE.link = svgE.link.data(data.links, d => d.source.id + "-" + d.target.id);
+            svgE.link = svgE.link.data(data.links, d => d.id);
             svgE.link.exit().remove();
             svgE.link = svgE.link.enter()
                 .append("path")
@@ -264,7 +265,7 @@ limitations under the License.
 
             dragHandler(svgE.node);
 
-            setTooltip(0);
+            setTooltip(null);
             restartSimulation();
         }
 
