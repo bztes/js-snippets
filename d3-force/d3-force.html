@@ -198,25 +198,25 @@ limitations under the License.
 
             for (let i = 0; i < nodes.length; i++) {
                 let node = nodes[i];
-                if (node.dfs === undefined) {
+                if (node.index === undefined) {
                     dfs(node);
                 }
             }
 
             function dfs(node) {
-                node.dfs = index;
+                node.index = index;
                 node.lowlink = node;
                 index++;
                 stack.push(node);
                 node.inStack = true;
                 node.outs.forEach(out => {
-                    if (out.dfs === undefined) {
+                    if (out.index === undefined) {
                         dfs(out);
-                        if (out.lowlink.dfs < node.lowlink.dfs) {
+                        if (out.lowlink.index < node.lowlink.index) {
                             node.lowlink = out.lowlink;
                         }
                     }
-                    else if (out.inStack && out.dfs < node.lowlink.dfs) {
+                    else if (out.inStack && out.index < node.lowlink.index) {
                         node.lowlink = out;
                     }
                 });
@@ -335,11 +335,11 @@ limitations under the License.
         }
 
         function nodeColor(d) {
-            return d.lowlink.sccSize < 2 ? "#f5f5f5" : nodeColors(d.lowlink.dfs);
+            return d.lowlink.sccSize < 2 ? "#f5f5f5" : nodeColors(d.lowlink.index);
         }
 
         function linkColor(d) {
-            return d.source.lowlink !== d.target.lowlink ? "#eee" : nodeColors(d.source.lowlink.dfs);
+            return d.source.lowlink !== d.target.lowlink ? "#eee" : nodeColors(d.source.lowlink.index);
         }
 
         function curvedEdges(d) {
