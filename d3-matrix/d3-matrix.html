@@ -97,7 +97,8 @@ limitations under the License.
 
     svg.call(d3.zoom()
       .scaleExtent([0.1, 8])
-      .on("zoom", zoomed));
+      .on("zoom", zoomed))
+      .on("dblclick.zoom", null);
 
     function dragoverHandler(evt) {
       evt.stopPropagation();
