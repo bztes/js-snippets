@@ -290,7 +290,7 @@ limitations under the License.
       var entered = axis.enter().append("g")
         .attr("transform", d => `translate(0, ${d.parent ? nodeStates[d.parent.index].index * nodeSize : 0})`)
         .style("opacity", 0)
-        .on("mouseover", d => highlight(nodeStates[d.index].index, nodes.length, nodes === data.sNodes))
+        .on("mouseover", d => highlight(nodeStates[d.index].index, nodes.length, rows))
         .on("mouseout", clearHighlight)
       var merge = entered.merge(axis)
         .transition().duration(transTime)
@@ -321,8 +321,8 @@ limitations under the License.
       data.sNodes = treeList(data.root, data.sNodeStates);
       data.tNodes = treeList(data.root, data.tNodeStates);
 
-      redrawAxis(rowsAxis, data.sNodes, data.sNodeStates);
-      redrawAxis(columnsAxis, data.tNodes, data.tNodeStates);
+      redrawAxis(rowsAxis, data.sNodes, data.sNodeStates, true);
+      redrawAxis(columnsAxis, data.tNodes, data.tNodeStates, false);
 
       data.links = linkList(data.sNodes, data.tNodes);
 
