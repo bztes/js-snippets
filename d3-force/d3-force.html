@@ -38,6 +38,10 @@ limitations under the License.
             fill: none;
         }
 
+        #graph svg .linkLabels text {
+            fill: #333;
+        }
+
         #graph svg .nodes circle {
             stroke: #333333;
             stroke-width: 1px;
@@ -95,6 +99,7 @@ limitations under the License.
         svgE.svg = div.append("svg").attr("width", "100%").attr("height", "100%");
         svgE.g = svgE.svg.append("g").attr("class", "everything");
         svgE.link = svgE.g.append("g").attr("class", "links").selectAll(".link");
+        svgE.linkLabels = svgE.g.append("g").attr("class", "linkLabels").selectAll(".linkLabels");
         svgE.node = svgE.g.append("g").attr("class", "nodes").selectAll(".node");
 
         // build the arrow.
@@ -103,9 +108,11 @@ limitations under the License.
             .enter().append("svg:marker")
             .attr("id", String)
             .attr("viewBox", "0 -5 10 10")
-            .attr("refY", -0.25)
+            .attr("refX", 15)
+            .attr("refY", -1.5)
             .attr("markerWidth", 6)
             .attr("markerHeight", 6)
+            .attr("orient", "auto")
             .attr("orient", "auto")
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5")
@@ -142,7 +149,7 @@ limitations under the License.
             var nodesCount = 2 + getRandomInt(198);
             var linksCount = nodesCount + getRandomInt(nodesCount);
             var data = createDummyData(nodesCount, linksCount);
-            load(data);
+            loadJson(data);
 
             function createDummyData(nodesCount, linksCount) {
                 var data = { nodes: [], links: [] };
@@ -156,7 +163,7 @@ limitations under the License.
                         id: i,
                         source: getRandomInt(nodesCount),
                         target: getRandomInt(nodesCount),
-                        label: getRandomInt(2)
+                        label: getRandomInt(20)
                     });
                 }
 
@@ -226,7 +233,7 @@ limitations under the License.
             }
         }
 
-        function load(jsonData) {
+        function loadJson(jsonData) {
             data.nodes = jsonData.nodes;
             data.links = jsonData.links;
             createRefs(data.nodes, data.links);
@@ -235,19 +242,38 @@ limitations under the License.
         }
 
         function redraw() {
+            // links
             svgE.link = svgE.link.data(data.links, d => d.id);
             svgE.link.exit().remove();
             svgE.link = svgE.link.enter()
                 .append("path")
                 .attr("class", "link")
-                .attr("marker-mid", "url(#end)")
+                .attr("id", d => d.id)
+                .attr("marker-end", "url(#end)")
                 .merge(svgE.link)
                 .attr("stroke", linkColor);
 
+            // link labels
+            svgE.linkLabels = svgE.linkLabels.data(data.links, d => d.id);
+            svgE.linkLabels.exit().remove();
+
+            let svgLinkLabelsEnter = svgE.linkLabels.enter().append("text").attr("class", "linkLabels");
+
+            svgLinkLabelsEnter.append("textPath")
+                .attr("startOffset", "50%")
+                .attr("text-anchor", "middle");
+
+            svgE.linkLabels = svgE.linkLabels.merge(svgLinkLabelsEnter);
+
+            svgE.linkLabels.select("textPath")
+                .attr("xlink:href", d => `#${d.id}`)
+                .text(d => d.label);
+
+            // nodes
             svgE.node = svgE.node.data(data.nodes, d => d.id);
             svgE.node.exit().remove();
 
-            var svgNodeEnter = svgE.node.enter().append("g").attr("class", "node");
+            let svgNodeEnter = svgE.node.enter().append("g").attr("class", "node");
 
             svgNodeEnter.append("circle")
                 .on("mouseover", d => setTooltip(`Name: ${d.name}<br>SCCSize: ${d.lowlink.sccSize}`))
