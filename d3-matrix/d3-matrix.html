@@ -205,7 +205,7 @@ limitations under the License.
     }
 
     function toggleCollapse(nodeIndex, nodeStates) {
-      var nodeState = nodeStates[nodeIndex];
+      let nodeState = nodeStates[nodeIndex];
       nodeState.collapsed = !nodeState.collapsed;
       redraw();
     }
@@ -284,13 +284,13 @@ limitations under the License.
       }
     }
 
-    function redrawAxis(group, nodes, nodeStates) {
+    function redrawAxis(group, nodes, nodeStates, rows) {
       var axis = group.selectAll("g").data(nodes, d => d.index);
       axis.exit().remove();
       var entered = axis.enter().append("g")
         .attr("transform", d => `translate(0, ${d.parent ? nodeStates[d.parent.index].index * nodeSize : 0})`)
         .style("opacity", 0)
-        .on("mouseover", (d, i) => highlight(nodeStates[d.index].index, nodes.length, nodes === data.sNodes))
+        .on("mouseover", d => highlight(nodeStates[d.index].index, nodes.length, nodes === data.sNodes))
         .on("mouseout", clearHighlight)
       var merge = entered.merge(axis)
         .transition().duration(transTime)
@@ -339,6 +339,13 @@ limitations under the License.
         .on("mouseout", _ => {
           clearHighlight();
           setTooltip(null);
+        })
+        .on("dblclick", d => {
+          let sNodeState = data.sNodeStates[d.source.index];
+          sNodeState.collapsed = !sNodeState.collapsed;
+          let tNodeState = data.tNodeStates[d.target.index];
+          tNodeState.collapsed = sNodeState.collapsed;
+          redraw();
         })
         .merge(linkCircle)
         .attr("x", (d, i) => d.tIndex * nodeSize)
