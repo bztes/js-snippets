@@ -292,6 +292,7 @@ limitations under the License.
         .style("opacity", 0)
         .on("mouseover", d => highlight(nodeStates[d.index].index, nodes.length, rows))
         .on("mouseout", clearHighlight)
+        .on("dblclick", d => toggleCollapse(d.index, nodeStates));
       var merge = entered.merge(axis)
         .transition().duration(transTime)
         .attr("transform", (d, i) => `translate(0, ${i * nodeSize})`)
