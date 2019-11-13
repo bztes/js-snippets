@@ -1,3 +1,18 @@
+<!--
+Copyright 2019 Nico Beierle <nico.beierle@gmail.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
 <!DOCTYPE html>
 <html>
 
@@ -10,12 +25,9 @@
 
 <body>
   <div class="topleft">
-    <div class="upload-btn-wrapper">
-      <button>Open</button>
-      <input type='file' accept='text/csv' onchange='loadFile(event)'>
-    </div>
-    <div><button onclick="saveSvg(document.getElementById('treemap'), 'treemap.svg');">SVG</button></div>
-    <div><button onclick="saveSvgAsPng(document.getElementById('treemap'), 'treemap.png');">PNG</button></div>
+    <div><button onclick="loadRandomTree();">Random</button></div>
+    <div><button onclick="saveSvg(document.getElementById('treemap'), 'treemap.svg');">Save as SVG</button></div>
+    <div><button onclick="saveSvgAsPng(document.getElementById('treemap'), 'treemap.png');">Save as PNG</button></div>
   </div>
   <div class="loader"></div>
   <svg id="treemap"></svg>
@@ -25,8 +37,13 @@
     var maxLabelFill = 0.8;
     var labelRotation = -90;
     var outerPadding = 5;
-    var innerPadding = 3;
-    var tile = d3.treemapSquarify; // treemapSliceDice, treemapBinary
+    var innerPadding = 2;
+    var tile = d3.treemapSquarify;
+    //var tile = d3.treemapResquarify;
+    //var tile = d3.treemapDice;
+    //var tile = d3.treemapSlice;
+    //var tile = d3.treemapSliceDice;
+    //var tile = d3.treemapBinary;
 
     var tooltip = d3.select('.tooltip');
     var loader = document.getElementsByClassName('loader')[0];
@@ -36,16 +53,65 @@
     var treeData;
     var treeLayout;
 
-    function loadFile(event) {
-      loader.classList.add('show');
-      var reader = new FileReader();
-      reader.onload = () => loadCSV(reader.result);
-      reader.readAsText(event.target.files[0]);
+    loadRandomTree();
+
+    function loadRandomTree() {
+      var maxChildren = 15;
+      var maxDeep = 4;
+      var nextId = 0;
+      var data = [];
+      data.push({ id: nextId++, parentId: undefined, label: "ROOT" });
+      loadRandomTreeData(data, 0, maxChildren, maxDeep);
+      loadJson(data);
+
+      function loadRandomTreeData(data, parentId, maxChildren, maxDeep) {
+        if (maxDeep == 0) {
+          return 0;
+        }
+
+        var nbrOfChildren = getRandomInt(maxChildren);
+        var color = getRandomColor();
+        for (var i = 0; i < nbrOfChildren; i++) {
+          let item = {
+            id: nextId,
+            parentId: parentId,
+            size: maxDeep == 1 ? 1 + getRandomInt(100) : 0,
+            label: nextId
+          };
+          nextId++;
+          data.push(item);
+          if (loadRandomTreeData(data, item.id, maxChildren, maxDeep - 1) == 0) {
+            item.color = color;
+          }
+        }
+
+        return nbrOfChildren;
+      }
+
+      function getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+      }
+
+      function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+      }
     }
 
     function loadCSV(csvString) {
-      var csv = d3.csvParse(csvString);
-      var data = d3.stratify()(csv);
+      loadJson(d3.csvParse(csvString));
+    }
+
+    function loadJsonString(jsonString) {
+      loadJson(JSON.parse(jsonString));
+    }
+
+    function loadJson(json) {
+      var data = d3.stratify()(json);
       treeData = d3.hierarchy(data).sum(d => d.data.size);
       resize(window.innerWidth, window.innerHeight);
       loader.classList.remove('show');
@@ -64,7 +130,7 @@
     function redraw() {
       var rect = gRect.selectAll('rect').data(descendants);
       rect.enter().append('rect')
-        .on("click", function(d) {
+        .on("click", function (d) {
           toggleSelection(d3.select(this), d);
         })
         .on("mouseover", d => {
@@ -99,7 +165,7 @@
           return "translate(" + cx + "," + cy + ") rotate(" + rotate + ")";
         })
         .text(d => d.data.data.label)
-        .style("font-size", function(d) {
+        .style("font-size", function (d) {
           width = d.x1 - d.x0;
           height = d.y1 - d.y0;
           maxLabelLength = Math.max(width, height);
