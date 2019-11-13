@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="d3.min.js"></script>
+  <script src="saveSvgAsPng.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <div class="topleft">
+    <div class="upload-btn-wrapper">
+      <button>Open</button>
+      <input type='file' accept='text/csv' onchange='loadFile(event)'>
+    </div>
+    <div><button onclick="saveSvg(document.getElementById('treemap'), 'treemap.svg');">SVG</button></div>
+    <div><button onclick="saveSvgAsPng(document.getElementById('treemap'), 'treemap.png');">PNG</button></div>
+  </div>
+  <div class="loader"></div>
+  <svg id="treemap"></svg>
+  <div class="tooltip"></div>
+  <script>
+    var maxLabelSize = 80;
+    var maxLabelFill = 0.8;
+    var labelRotation = -90;
+    var outerPadding = 5;
+    var innerPadding = 3;
+    var tile = d3.treemapSquarify; // treemapSliceDice, treemapBinary
+
+    var tooltip = d3.select('.tooltip');
+    var loader = document.getElementsByClassName('loader')[0];
+    var svg = d3.select('svg');
+    var gRect = svg.append('g');
+    var gText = svg.append('g');
+    var treeData;
+    var treeLayout;
+
+    function loadFile(event) {
+      loader.classList.add('show');
+      var reader = new FileReader();
+      reader.onload = () => loadCSV(reader.result);
+      reader.readAsText(event.target.files[0]);
+    }
+
+    function loadCSV(csvString) {
+      var csv = d3.csvParse(csvString);
+      var data = d3.stratify()(csv);
+      treeData = d3.hierarchy(data).sum(d => d.data.size);
+      resize(window.innerWidth, window.innerHeight);
+      loader.classList.remove('show');
+    }
+
+    function resize(width, height) {
+      if (!treeData) return;
+
+      svg.attr('width', width).attr('height', height);
+      treeLayout = d3.treemap().tile(tile).size([width, height]).paddingOuter(outerPadding).paddingInner(innerPadding);
+      treeLayout(treeData);
+      descendants = treeData.descendants().filter(d => d.x1 - d.x0 > 0 && d.y1 - d.y0 > 0);
+      redraw();
+    }
+
+    function redraw() {
+      var rect = gRect.selectAll('rect').data(descendants);
+      rect.enter().append('rect')
+        .on("click", function(d) {
+          toggleSelection(d3.select(this), d);
+        })
+        .on("mouseover", d => {
+          tooltip.classed("show", true);
+          tooltip.html(d.data.data.label + "<br/>" + d.value)
+            .style("left", d3.event.pageX + "px")
+            .style("top", d3.event.pageY + "px");
+        })
+        .on("mouseout", () => tooltip.classed("show", false))
+        .merge(rect)
+        .classed("selected", d => d.isSelected)
+        .attr('x', d => d.x0)
+        .attr('y', d => d.y0)
+        .attr('width', d => d.x1 - d.x0)
+        .attr('height', d => d.y1 - d.y0)
+        .style('fill', d => d.data.data.color);
+      rect.exit().remove();
+
+      redrawSelection();
+    }
+
+    function redrawSelection() {
+      var text = gText.selectAll("text").data(descendants.filter(d => d.isSelected))
+      text.enter().append("text")
+        .merge(text)
+        .attr("transform", d => {
+          width = d.x1 - d.x0;
+          height = d.y1 - d.y0;
+          cx = d.x0 + (width) / 2;
+          cy = d.y0 + (height) / 2;
+          rotate = width < height ? labelRotation : 0;
+          return "translate(" + cx + "," + cy + ") rotate(" + rotate + ")";
+        })
+        .text(d => d.data.data.label)
+        .style("font-size", function(d) {
+          width = d.x1 - d.x0;
+          height = d.y1 - d.y0;
+          maxLabelLength = Math.max(width, height);
+          oldFontSize = this.style.fontSize ? this.style.fontSize.slice(0, -2) : 20;
+          newFontSize = Math.min(Math.min(width, height) * maxLabelFill, maxLabelSize);
+          return Math.min(newFontSize, (maxLabelLength * maxLabelFill) / this.getComputedTextLength() * oldFontSize) + "px";
+        });
+      text.exit().remove();
+    }
+
+    function toggleSelection(element, d) {
+      d.isSelected = !d.isSelected;
+      element.classed("selected", d.isSelected);
+      redrawSelection();
+    }
+
+    window.addEventListener("resize", () => resize(window.innerWidth, window.innerHeight));
+  </script>
+</body>
+
+</html>
