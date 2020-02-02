@@ -1,0 +1,186 @@
+<!--
+Copyright 2019 Nico Beierle <nico.beierle@gmail.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .axis .domain {
+        display: none;
+      }
+      #chart {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+      }
+
+      div.tooltip {
+        position: absolute;
+        background: #3a3a3a;
+        color: #fff;
+        pointer-events: none;
+        padding: 5px;
+        margin: 10px 0 0 10px;
+        border-radius: 3px;
+      }
+    </style>
+    <script src="d3.min.js"></script>
+  </head>
+  <body>
+    <div
+      ondragover="dragoverHandler(event)"
+      ondrop="loadFile(event)"
+      id="chart"
+    ></div>
+    <script>
+      var data;
+      var width;
+      var height;
+
+      var margin = { top: 40, right: 100, bottom: 60, left: 60 };
+      var div = d3.select("#chart");
+      var svg = div
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%");
+      var tooltip = d3
+        .select("body")
+        .append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+      function dragoverHandler(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        evt.dataTransfer.dropEffect = "copy";
+      }
+
+      function loadFile(event) {
+        event.stopPropagation();
+        event.preventDefault();
+
+        var reader = new FileReader();
+        reader.onload = loadEvent => this.loadCSV(loadEvent.target.result);
+        reader.readAsText(event.dataTransfer.files[0]);
+      }
+
+      function loadCSV(csvString) {
+        data = d3.csvParse(csvString);
+
+        onModelChanged();
+      }
+
+      function updateDim() {
+        let boundingBox = div.node().getBoundingClientRect();
+        width = boundingBox.width - margin.left - margin.right;
+        height = boundingBox.height - margin.top - margin.bottom;
+      }
+
+      function setTooltip(html) {
+        if (html) {
+          tooltip
+            .html(html)
+            .style("left", d3.event.pageX + "px")
+            .style("top", d3.event.pageY + "px")
+            .style("opacity", 1);
+        } else {
+          tooltip.style("opacity", 0);
+        }
+      }
+
+      function onModelChanged() {
+        updateDim();
+        var g = svg
+          .append("g")
+          .attr(
+            "transform",
+            "translate(" + margin.left + "," + margin.top + ")"
+          );
+
+        var x0 = d3
+          .scaleBand()
+          .rangeRound([0, width])
+          .paddingInner(0.05);
+
+        var x1 = d3.scaleBand().padding(0.05);
+
+        var y = d3.scaleLinear().rangeRound([height, 0]);
+
+        var z = d3
+          .scaleOrdinal()
+          .range([
+            "#98abc5",
+            "#8a89a6",
+            "#7b6888",
+            "#6b486b",
+            "#a05d56",
+            "#d0743c",
+            "#ff8c00"
+          ]);
+
+        var stack = d3.stack().offset(d3.stackOffsetExpand);
+
+        x0.domain(data.map(d => d.group));
+        x1.domain(data.map(d => d.x))
+          .rangeRound([0, x0.bandwidth()])
+          .padding(0.1);
+        z.domain(data.map(d => d.y));
+
+        var keys = z.domain();
+
+        var groupData = d3
+          .nest()
+          .key(d => d.x + d.group)
+          .rollup((d, i) => {
+            var d2 = { x: d[0].x, group: d[0].group };
+            d.forEach(d => (d2[d.y] = d.value));
+            return d2;
+          })
+          .entries(data)
+          .map(d => d.value);
+
+        var stackData = stack.keys(keys)(groupData);
+
+
+        g
+          .selectAll("rect")
+          .data(stackData)
+          .enter()
+          .append("rect")
+          .attr("class", "serie-rect")
+          .attr("transform", d => "translate(" + x0(d.data.group) + ",0)")
+          .attr("x", d => x1(d.data.x))
+          .attr("y", d => y(d[1]))
+          .attr("height", d => y(d[0]) - y(d[1]))
+          .attr("width", x1.bandwidth())
+          .attr("fill", d => z(d.key))
+          .on("mouseover", d => setTooltip(`Value: ${d.data}`))
+          .on("mouseout", _ => setTooltip(null));
+
+        g.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x0));
+
+        g.append("g")
+          .attr("class", "axis")
+          .call(d3.axisLeft(y));
+      }
+    </script>
+  </body>
+</html>
