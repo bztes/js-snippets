@@ -1,0 +1,1292 @@
+{
+    "name": "flare",
+    "cqi": 39,
+    "children": [
+        {
+            "name": "analytics",
+            "cqi": 39,
+            "children": [
+                {
+                    "name": "cluster",
+                    "cqi": 39,
+                    "children": [
+                        {
+                            "name": "AgglomerativeCluster",
+                            "size": 3938,
+                            "cqi": 39
+                        },
+                        {
+                            "name": "CommunityStructure",
+                            "size": 3812,
+                            "cqi": 38
+                        },
+                        {
+                            "name": "HierarchicalCluster",
+                            "size": 6714,
+                            "cqi": 67
+                        },
+                        {
+                            "name": "MergeEdge",
+                            "size": 743,
+                            "cqi": 74
+                        }
+                    ]
+                },
+                {
+                    "name": "graph",
+                    "cqi": 35,
+                    "children": [
+                        {
+                            "name": "BetweennessCentrality",
+                            "size": 3534,
+                            "cqi": 35
+                        },
+                        {
+                            "name": "LinkDistance",
+                            "size": 5731,
+                            "cqi": 57
+                        },
+                        {
+                            "name": "MaxFlowMinCut",
+                            "size": 7840,
+                            "cqi": 78
+                        },
+                        {
+                            "name": "ShortestPaths",
+                            "size": 5914,
+                            "cqi": 59
+                        },
+                        {
+                            "name": "SpanningTree",
+                            "size": 3416,
+                            "cqi": 34
+                        }
+                    ]
+                },
+                {
+                    "name": "optimization",
+                    "cqi": 70,
+                    "children": [
+                        {
+                            "name": "AspectRatioBanker",
+                            "size": 7074,
+                            "cqi": 70
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "animate",
+            "cqi": 17,
+            "children": [
+                {
+                    "name": "Easing",
+                    "size": 17010,
+                    "cqi": 17
+                },
+                {
+                    "name": "FunctionSequence",
+                    "size": 5842,
+                    "cqi": 58
+                },
+                {
+                    "name": "interpolate",
+                    "cqi": 19,
+                    "children": [
+                        {
+                            "name": "ArrayInterpolator",
+                            "size": 1983,
+                            "cqi": 19
+                        },
+                        {
+                            "name": "ColorInterpolator",
+                            "size": 2047,
+                            "cqi": 20
+                        },
+                        {
+                            "name": "DateInterpolator",
+                            "size": 1375,
+                            "cqi": 13
+                        },
+                        {
+                            "name": "Interpolator",
+                            "size": 8746,
+                            "cqi": 87
+                        },
+                        {
+                            "name": "MatrixInterpolator",
+                            "size": 2202,
+                            "cqi": 22
+                        },
+                        {
+                            "name": "NumberInterpolator",
+                            "size": 1382,
+                            "cqi": 13
+                        },
+                        {
+                            "name": "ObjectInterpolator",
+                            "size": 1629,
+                            "cqi": 16
+                        },
+                        {
+                            "name": "PointInterpolator",
+                            "size": 1675,
+                            "cqi": 16
+                        },
+                        {
+                            "name": "RectangleInterpolator",
+                            "size": 2042,
+                            "cqi": 20
+                        }
+                    ]
+                },
+                {
+                    "name": "ISchedulable",
+                    "size": 1041,
+                    "cqi": 10
+                },
+                {
+                    "name": "Parallel",
+                    "size": 5176,
+                    "cqi": 51
+                },
+                {
+                    "name": "Pause",
+                    "size": 449,
+                    "cqi": 44
+                },
+                {
+                    "name": "Scheduler",
+                    "size": 5593,
+                    "cqi": 55
+                },
+                {
+                    "name": "Sequence",
+                    "size": 5534,
+                    "cqi": 55
+                },
+                {
+                    "name": "Transition",
+                    "size": 9201,
+                    "cqi": 92
+                },
+                {
+                    "name": "Transitioner",
+                    "size": 19975,
+                    "cqi": 19
+                },
+                {
+                    "name": "TransitionEvent",
+                    "size": 1116,
+                    "cqi": 11
+                },
+                {
+                    "name": "Tween",
+                    "size": 6006,
+                    "cqi": 60
+                }
+            ]
+        },
+        {
+            "name": "data",
+            "cqi": 39,
+            "children": [
+                {
+                    "name": "converters",
+                    "cqi": 72,
+                    "children": [
+                        {
+                            "name": "Converters",
+                            "size": 721,
+                            "cqi": 72
+                        },
+                        {
+                            "name": "DelimitedTextConverter",
+                            "size": 4294,
+                            "cqi": 42
+                        },
+                        {
+                            "name": "GraphMLConverter",
+                            "size": 9800,
+                            "cqi": 98
+                        },
+                        {
+                            "name": "IDataConverter",
+                            "size": 1314,
+                            "cqi": 13
+                        },
+                        {
+                            "name": "JSONConverter",
+                            "size": 2220,
+                            "cqi": 22
+                        }
+                    ]
+                },
+                {
+                    "name": "DataField",
+                    "size": 1759,
+                    "cqi": 17
+                },
+                {
+                    "name": "DataSchema",
+                    "size": 2165,
+                    "cqi": 21
+                },
+                {
+                    "name": "DataSet",
+                    "size": 586,
+                    "cqi": 58
+                },
+                {
+                    "name": "DataSource",
+                    "size": 3331,
+                    "cqi": 33
+                },
+                {
+                    "name": "DataTable",
+                    "size": 772,
+                    "cqi": 77
+                },
+                {
+                    "name": "DataUtil",
+                    "size": 3322,
+                    "cqi": 33
+                }
+            ]
+        },
+        {
+            "name": "display",
+            "cqi": 88,
+            "children": [
+                {
+                    "name": "DirtySprite",
+                    "size": 8833,
+                    "cqi": 88
+                },
+                {
+                    "name": "LineSprite",
+                    "size": 1732,
+                    "cqi": 17
+                },
+                {
+                    "name": "RectSprite",
+                    "size": 3623,
+                    "cqi": 36
+                },
+                {
+                    "name": "TextSprite",
+                    "size": 10066,
+                    "cqi": 10
+                }
+            ]
+        },
+        {
+            "name": "flex",
+            "cqi": 41,
+            "children": [
+                {
+                    "name": "FlareVis",
+                    "size": 4116,
+                    "cqi": 41
+                }
+            ]
+        },
+        {
+            "name": "physics",
+            "cqi": 10,
+            "children": [
+                {
+                    "name": "DragForce",
+                    "size": 1082,
+                    "cqi": 10
+                },
+                {
+                    "name": "GravityForce",
+                    "size": 1336,
+                    "cqi": 13
+                },
+                {
+                    "name": "IForce",
+                    "size": 319,
+                    "cqi": 31
+                },
+                {
+                    "name": "NBodyForce",
+                    "size": 10498,
+                    "cqi": 10
+                },
+                {
+                    "name": "Particle",
+                    "size": 2822,
+                    "cqi": 28
+                },
+                {
+                    "name": "Simulation",
+                    "size": 9983,
+                    "cqi": 99
+                },
+                {
+                    "name": "Spring",
+                    "size": 2213,
+                    "cqi": 22
+                },
+                {
+                    "name": "SpringForce",
+                    "size": 1681,
+                    "cqi": 16
+                }
+            ]
+        },
+        {
+            "name": "query",
+            "cqi": 16,
+            "children": [
+                {
+                    "name": "AggregateExpression",
+                    "size": 1616,
+                    "cqi": 16
+                },
+                {
+                    "name": "And",
+                    "size": 1027,
+                    "cqi": 10
+                },
+                {
+                    "name": "Arithmetic",
+                    "size": 3891,
+                    "cqi": 38
+                },
+                {
+                    "name": "Average",
+                    "size": 891,
+                    "cqi": 89
+                },
+                {
+                    "name": "BinaryExpression",
+                    "size": 2893,
+                    "cqi": 28
+                },
+                {
+                    "name": "Comparison",
+                    "size": 5103,
+                    "cqi": 51
+                },
+                {
+                    "name": "CompositeExpression",
+                    "size": 3677,
+                    "cqi": 36
+                },
+                {
+                    "name": "Count",
+                    "size": 781,
+                    "cqi": 78
+                },
+                {
+                    "name": "DateUtil",
+                    "size": 4141,
+                    "cqi": 41
+                },
+                {
+                    "name": "Distinct",
+                    "size": 933,
+                    "cqi": 93
+                },
+                {
+                    "name": "Expression",
+                    "size": 5130,
+                    "cqi": 51
+                },
+                {
+                    "name": "ExpressionIterator",
+                    "size": 3617,
+                    "cqi": 36
+                },
+                {
+                    "name": "Fn",
+                    "size": 3240,
+                    "cqi": 32
+                },
+                {
+                    "name": "If",
+                    "size": 2732,
+                    "cqi": 27
+                },
+                {
+                    "name": "IsA",
+                    "size": 2039,
+                    "cqi": 20
+                },
+                {
+                    "name": "Literal",
+                    "size": 1214,
+                    "cqi": 12
+                },
+                {
+                    "name": "Match",
+                    "size": 3748,
+                    "cqi": 37
+                },
+                {
+                    "name": "Maximum",
+                    "size": 843,
+                    "cqi": 84
+                },
+                {
+                    "name": "methods",
+                    "cqi": 59,
+                    "children": [
+                        {
+                            "name": "add",
+                            "size": 593,
+                            "cqi": 59
+                        },
+                        {
+                            "name": "and",
+                            "size": 330,
+                            "cqi": 33
+                        },
+                        {
+                            "name": "average",
+                            "size": 287,
+                            "cqi": 28
+                        },
+                        {
+                            "name": "count",
+                            "size": 277,
+                            "cqi": 27
+                        },
+                        {
+                            "name": "distinct",
+                            "size": 292,
+                            "cqi": 29
+                        },
+                        {
+                            "name": "div",
+                            "size": 595,
+                            "cqi": 59
+                        },
+                        {
+                            "name": "eq",
+                            "size": 594,
+                            "cqi": 59
+                        },
+                        {
+                            "name": "fn",
+                            "size": 460,
+                            "cqi": 46
+                        },
+                        {
+                            "name": "gt",
+                            "size": 603,
+                            "cqi": 60
+                        },
+                        {
+                            "name": "gte",
+                            "size": 625,
+                            "cqi": 62
+                        },
+                        {
+                            "name": "iff",
+                            "size": 748,
+                            "cqi": 74
+                        },
+                        {
+                            "name": "isa",
+                            "size": 461,
+                            "cqi": 46
+                        },
+                        {
+                            "name": "lt",
+                            "size": 597,
+                            "cqi": 59
+                        },
+                        {
+                            "name": "lte",
+                            "size": 619,
+                            "cqi": 61
+                        },
+                        {
+                            "name": "max",
+                            "size": 283,
+                            "cqi": 28
+                        },
+                        {
+                            "name": "min",
+                            "size": 283,
+                            "cqi": 28
+                        },
+                        {
+                            "name": "mod",
+                            "size": 591,
+                            "cqi": 59
+                        },
+                        {
+                            "name": "mul",
+                            "size": 603,
+                            "cqi": 60
+                        },
+                        {
+                            "name": "neq",
+                            "size": 599,
+                            "cqi": 59
+                        },
+                        {
+                            "name": "not",
+                            "size": 386,
+                            "cqi": 38
+                        },
+                        {
+                            "name": "or",
+                            "size": 323,
+                            "cqi": 32
+                        },
+                        {
+                            "name": "orderby",
+                            "size": 307,
+                            "cqi": 30
+                        },
+                        {
+                            "name": "range",
+                            "size": 772,
+                            "cqi": 77
+                        },
+                        {
+                            "name": "select",
+                            "size": 296,
+                            "cqi": 29
+                        },
+                        {
+                            "name": "stddev",
+                            "size": 363,
+                            "cqi": 36
+                        },
+                        {
+                            "name": "sub",
+                            "size": 600,
+                            "cqi": 60
+                        },
+                        {
+                            "name": "sum",
+                            "size": 280,
+                            "cqi": 28
+                        },
+                        {
+                            "name": "update",
+                            "size": 307,
+                            "cqi": 30
+                        },
+                        {
+                            "name": "variance",
+                            "size": 335,
+                            "cqi": 33
+                        },
+                        {
+                            "name": "where",
+                            "size": 299,
+                            "cqi": 29
+                        },
+                        {
+                            "name": "xor",
+                            "size": 354,
+                            "cqi": 35
+                        },
+                        {
+                            "name": "_",
+                            "size": 264,
+                            "cqi": 26
+                        }
+                    ]
+                },
+                {
+                    "name": "Minimum",
+                    "size": 843,
+                    "cqi": 84
+                },
+                {
+                    "name": "Not",
+                    "size": 1554,
+                    "cqi": 15
+                },
+                {
+                    "name": "Or",
+                    "size": 970,
+                    "cqi": 97
+                },
+                {
+                    "name": "Query",
+                    "size": 13896,
+                    "cqi": 13
+                },
+                {
+                    "name": "Range",
+                    "size": 1594,
+                    "cqi": 15
+                },
+                {
+                    "name": "StringUtil",
+                    "size": 4130,
+                    "cqi": 41
+                },
+                {
+                    "name": "Sum",
+                    "size": 791,
+                    "cqi": 79
+                },
+                {
+                    "name": "Variable",
+                    "size": 1124,
+                    "cqi": 11
+                },
+                {
+                    "name": "Variance",
+                    "size": 1876,
+                    "cqi": 18
+                },
+                {
+                    "name": "Xor",
+                    "size": 1101,
+                    "cqi": 11
+                }
+            ]
+        },
+        {
+            "name": "scale",
+            "cqi": 21,
+            "children": [
+                {
+                    "name": "IScaleMap",
+                    "size": 2105,
+                    "cqi": 21
+                },
+                {
+                    "name": "LinearScale",
+                    "size": 1316,
+                    "cqi": 13
+                },
+                {
+                    "name": "LogScale",
+                    "size": 3151,
+                    "cqi": 31
+                },
+                {
+                    "name": "OrdinalScale",
+                    "size": 3770,
+                    "cqi": 37
+                },
+                {
+                    "name": "QuantileScale",
+                    "size": 2435,
+                    "cqi": 24
+                },
+                {
+                    "name": "QuantitativeScale",
+                    "size": 4839,
+                    "cqi": 48
+                },
+                {
+                    "name": "RootScale",
+                    "size": 1756,
+                    "cqi": 17
+                },
+                {
+                    "name": "Scale",
+                    "size": 4268,
+                    "cqi": 42
+                },
+                {
+                    "name": "ScaleType",
+                    "size": 1821,
+                    "cqi": 18
+                },
+                {
+                    "name": "TimeScale",
+                    "size": 5833,
+                    "cqi": 58
+                }
+            ]
+        },
+        {
+            "name": "util",
+            "cqi": 82,
+            "children": [
+                {
+                    "name": "Arrays",
+                    "size": 8258,
+                    "cqi": 82
+                },
+                {
+                    "name": "Colors",
+                    "size": 10001,
+                    "cqi": 10
+                },
+                {
+                    "name": "Dates",
+                    "size": 8217,
+                    "cqi": 82
+                },
+                {
+                    "name": "Displays",
+                    "size": 12555,
+                    "cqi": 12
+                },
+                {
+                    "name": "Filter",
+                    "size": 2324,
+                    "cqi": 23
+                },
+                {
+                    "name": "Geometry",
+                    "size": 10993,
+                    "cqi": 10
+                },
+                {
+                    "name": "heap",
+                    "cqi": 93,
+                    "children": [
+                        {
+                            "name": "FibonacciHeap",
+                            "size": 9354,
+                            "cqi": 93
+                        },
+                        {
+                            "name": "HeapNode",
+                            "size": 1233,
+                            "cqi": 12
+                        }
+                    ]
+                },
+                {
+                    "name": "IEvaluable",
+                    "size": 335,
+                    "cqi": 33
+                },
+                {
+                    "name": "IPredicate",
+                    "size": 383,
+                    "cqi": 38
+                },
+                {
+                    "name": "IsizeProxy",
+                    "size": 874,
+                    "cqi": 87
+                },
+                {
+                    "name": "math",
+                    "cqi": 31,
+                    "children": [
+                        {
+                            "name": "DenseMatrix",
+                            "size": 3165,
+                            "cqi": 31
+                        },
+                        {
+                            "name": "IMatrix",
+                            "size": 2815,
+                            "cqi": 28
+                        },
+                        {
+                            "name": "SparseMatrix",
+                            "size": 3366,
+                            "cqi": 33
+                        }
+                    ]
+                },
+                {
+                    "name": "Maths",
+                    "size": 17705,
+                    "cqi": 17
+                },
+                {
+                    "name": "Orientation",
+                    "size": 1486,
+                    "cqi": 14
+                },
+                {
+                    "name": "palette",
+                    "cqi": 63,
+                    "children": [
+                        {
+                            "name": "ColorPalette",
+                            "size": 6367,
+                            "cqi": 63
+                        },
+                        {
+                            "name": "Palette",
+                            "size": 1229,
+                            "cqi": 12
+                        },
+                        {
+                            "name": "ShapePalette",
+                            "size": 2059,
+                            "cqi": 20
+                        },
+                        {
+                            "name": "SizePalette",
+                            "size": 2291,
+                            "cqi": 22
+                        }
+                    ]
+                },
+                {
+                    "name": "Property",
+                    "size": 5559,
+                    "cqi": 55
+                },
+                {
+                    "name": "Shapes",
+                    "size": 19118,
+                    "cqi": 19
+                },
+                {
+                    "name": "Sort",
+                    "size": 6887,
+                    "cqi": 68
+                },
+                {
+                    "name": "Stats",
+                    "size": 6557,
+                    "cqi": 65
+                },
+                {
+                    "name": "Strings",
+                    "size": 22026,
+                    "cqi": 22
+                }
+            ]
+        },
+        {
+            "name": "vis",
+            "cqi": 39,
+            "children": [
+                {
+                    "name": "axis",
+                    "cqi": 13,
+                    "children": [
+                        {
+                            "name": "Axes",
+                            "size": 1302,
+                            "cqi": 13
+                        },
+                        {
+                            "name": "Axis",
+                            "size": 24593,
+                            "cqi": 24
+                        },
+                        {
+                            "name": "AxisGridLine",
+                            "size": 652,
+                            "cqi": 65
+                        },
+                        {
+                            "name": "AxisLabel",
+                            "size": 636,
+                            "cqi": 63
+                        },
+                        {
+                            "name": "CartesianAxes",
+                            "size": 6703,
+                            "cqi": 67
+                        }
+                    ]
+                },
+                {
+                    "name": "controls",
+                    "cqi": 21,
+                    "children": [
+                        {
+                            "name": "AnchorControl",
+                            "size": 2138,
+                            "cqi": 21
+                        },
+                        {
+                            "name": "ClickControl",
+                            "size": 3824,
+                            "cqi": 38
+                        },
+                        {
+                            "name": "Control",
+                            "size": 1353,
+                            "cqi": 13
+                        },
+                        {
+                            "name": "ControlList",
+                            "size": 4665,
+                            "cqi": 46
+                        },
+                        {
+                            "name": "DragControl",
+                            "size": 2649,
+                            "cqi": 26
+                        },
+                        {
+                            "name": "ExpandControl",
+                            "size": 2832,
+                            "cqi": 28
+                        },
+                        {
+                            "name": "HoverControl",
+                            "size": 4896,
+                            "cqi": 48
+                        },
+                        {
+                            "name": "IControl",
+                            "size": 763,
+                            "cqi": 76
+                        },
+                        {
+                            "name": "PanZoomControl",
+                            "size": 5222,
+                            "cqi": 52
+                        },
+                        {
+                            "name": "SelectionControl",
+                            "size": 7862,
+                            "cqi": 78
+                        },
+                        {
+                            "name": "TooltipControl",
+                            "size": 8435,
+                            "cqi": 84
+                        }
+                    ]
+                },
+                {
+                    "name": "data",
+                    "cqi": 20,
+                    "children": [
+                        {
+                            "name": "Data",
+                            "size": 20544,
+                            "cqi": 20
+                        },
+                        {
+                            "name": "DataList",
+                            "size": 19788,
+                            "cqi": 19
+                        },
+                        {
+                            "name": "DataSprite",
+                            "size": 10349,
+                            "cqi": 10
+                        },
+                        {
+                            "name": "EdgeSprite",
+                            "size": 3301,
+                            "cqi": 33
+                        },
+                        {
+                            "name": "NodeSprite",
+                            "size": 19382,
+                            "cqi": 19
+                        },
+                        {
+                            "name": "render",
+                            "cqi": 69,
+                            "children": [
+                                {
+                                    "name": "ArrowType",
+                                    "size": 698,
+                                    "cqi": 69
+                                },
+                                {
+                                    "name": "EdgeRenderer",
+                                    "size": 5569,
+                                    "cqi": 55
+                                },
+                                {
+                                    "name": "IRenderer",
+                                    "size": 353,
+                                    "cqi": 35
+                                },
+                                {
+                                    "name": "ShapeRenderer",
+                                    "size": 2247,
+                                    "cqi": 22
+                                }
+                            ]
+                        },
+                        {
+                            "name": "ScaleBinding",
+                            "size": 11275,
+                            "cqi": 11
+                        },
+                        {
+                            "name": "Tree",
+                            "size": 7147,
+                            "cqi": 71
+                        },
+                        {
+                            "name": "TreeBuilder",
+                            "size": 9930,
+                            "cqi": 99
+                        }
+                    ]
+                },
+                {
+                    "name": "events",
+                    "cqi": 23,
+                    "children": [
+                        {
+                            "name": "DataEvent",
+                            "size": 2313,
+                            "cqi": 23
+                        },
+                        {
+                            "name": "SelectionEvent",
+                            "size": 1880,
+                            "cqi": 18
+                        },
+                        {
+                            "name": "TooltipEvent",
+                            "size": 1701,
+                            "cqi": 17
+                        },
+                        {
+                            "name": "VisualizationEvent",
+                            "size": 1117,
+                            "cqi": 11
+                        }
+                    ]
+                },
+                {
+                    "name": "legend",
+                    "cqi": 20,
+                    "children": [
+                        {
+                            "name": "Legend",
+                            "size": 20859,
+                            "cqi": 20
+                        },
+                        {
+                            "name": "LegendItem",
+                            "size": 4614,
+                            "cqi": 46
+                        },
+                        {
+                            "name": "LegendRange",
+                            "size": 10530,
+                            "cqi": 10
+                        }
+                    ]
+                },
+                {
+                    "name": "operator",
+                    "cqi": 39,
+                    "children": [
+                        {
+                            "name": "distortion",
+                            "cqi": 44,
+                            "children": [
+                                {
+                                    "name": "BifocalDistortion",
+                                    "size": 4461,
+                                    "cqi": 44
+                                },
+                                {
+                                    "name": "Distortion",
+                                    "size": 6314,
+                                    "cqi": 63
+                                },
+                                {
+                                    "name": "FisheyeDistortion",
+                                    "size": 3444,
+                                    "cqi": 34
+                                }
+                            ]
+                        },
+                        {
+                            "name": "encoder",
+                            "cqi": 31,
+                            "children": [
+                                {
+                                    "name": "ColorEncoder",
+                                    "size": 3179,
+                                    "cqi": 31
+                                },
+                                {
+                                    "name": "Encoder",
+                                    "size": 4060,
+                                    "cqi": 40
+                                },
+                                {
+                                    "name": "PropertyEncoder",
+                                    "size": 4138,
+                                    "cqi": 41
+                                },
+                                {
+                                    "name": "ShapeEncoder",
+                                    "size": 1690,
+                                    "cqi": 16
+                                },
+                                {
+                                    "name": "SizeEncoder",
+                                    "size": 1830,
+                                    "cqi": 18
+                                }
+                            ]
+                        },
+                        {
+                            "name": "filter",
+                            "cqi": 52,
+                            "children": [
+                                {
+                                    "name": "FisheyeTreeFilter",
+                                    "size": 5219,
+                                    "cqi": 52
+                                },
+                                {
+                                    "name": "GraphDistanceFilter",
+                                    "size": 3165,
+                                    "cqi": 31
+                                },
+                                {
+                                    "name": "VisibilityFilter",
+                                    "size": 3509,
+                                    "cqi": 35
+                                }
+                            ]
+                        },
+                        {
+                            "name": "IOperator",
+                            "size": 1286,
+                            "cqi": 12
+                        },
+                        {
+                            "name": "label",
+                            "cqi": 99,
+                            "children": [
+                                {
+                                    "name": "Labeler",
+                                    "size": 9956,
+                                    "cqi": 99
+                                },
+                                {
+                                    "name": "RadialLabeler",
+                                    "size": 3899,
+                                    "cqi": 38
+                                },
+                                {
+                                    "name": "StackedAreaLabeler",
+                                    "size": 3202,
+                                    "cqi": 32
+                                }
+                            ]
+                        },
+                        {
+                            "name": "layout",
+                            "cqi": 67,
+                            "children": [
+                                {
+                                    "name": "AxisLayout",
+                                    "size": 6725,
+                                    "cqi": 67
+                                },
+                                {
+                                    "name": "BundledEdgeRouter",
+                                    "size": 3727,
+                                    "cqi": 37
+                                },
+                                {
+                                    "name": "CircleLayout",
+                                    "size": 9317,
+                                    "cqi": 93
+                                },
+                                {
+                                    "name": "CirclePackingLayout",
+                                    "size": 12003,
+                                    "cqi": 12
+                                },
+                                {
+                                    "name": "DendrogramLayout",
+                                    "size": 4853,
+                                    "cqi": 48
+                                },
+                                {
+                                    "name": "ForceDirectedLayout",
+                                    "size": 8411,
+                                    "cqi": 84
+                                },
+                                {
+                                    "name": "IcicleTreeLayout",
+                                    "size": 4864,
+                                    "cqi": 48
+                                },
+                                {
+                                    "name": "IndentedTreeLayout",
+                                    "size": 3174,
+                                    "cqi": 31
+                                },
+                                {
+                                    "name": "Layout",
+                                    "size": 7881,
+                                    "cqi": 78
+                                },
+                                {
+                                    "name": "NodeLinkTreeLayout",
+                                    "size": 12870,
+                                    "cqi": 12
+                                },
+                                {
+                                    "name": "PieLayout",
+                                    "size": 2728,
+                                    "cqi": 27
+                                },
+                                {
+                                    "name": "RadialTreeLayout",
+                                    "size": 12348,
+                                    "cqi": 12
+                                },
+                                {
+                                    "name": "RandomLayout",
+                                    "size": 870,
+                                    "cqi": 87
+                                },
+                                {
+                                    "name": "StackedAreaLayout",
+                                    "size": 9121,
+                                    "cqi": 91
+                                },
+                                {
+                                    "name": "TreeMapLayout",
+                                    "size": 9191,
+                                    "cqi": 91
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Operator",
+                            "size": 2490,
+                            "cqi": 24
+                        },
+                        {
+                            "name": "OperatorList",
+                            "size": 5248,
+                            "cqi": 52
+                        },
+                        {
+                            "name": "OperatorSequence",
+                            "size": 4190,
+                            "cqi": 41
+                        },
+                        {
+                            "name": "OperatorSwitch",
+                            "size": 2581,
+                            "cqi": 25
+                        },
+                        {
+                            "name": "SortOperator",
+                            "size": 2023,
+                            "cqi": 20
+                        }
+                    ]
+                },
+                {
+                    "name": "Visualization",
+                    "size": 16540,
+                    "cqi": 16
+                }
+            ]
+        }
+    ]
+}
