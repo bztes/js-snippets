@@ -1,0 +1,85 @@
+<!--
+Copyright 2020 Nico Beierle <nico.beierle@gmail.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DounatBars</title>
+    <script src="fileloader.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="dounatbars.js"></script>
+    <style>
+      #chart {
+        position: fixed;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+      }
+
+      text {
+        font: 12px sans-serif;
+        fill: #000;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      id="chart"
+      ondragover="fileDragOver(event)"
+      ondrop="loadFile(event)"
+      onclick="update()"
+    ></div>
+    <script>
+      var json;
+      dounatBars = new DounatBars("#chart");
+
+      function loadFile(event) {
+        event.stopPropagation();
+        event.preventDefault();
+
+        var reader = new FileReader();
+        reader.onload = (loadEvent) => loadData(loadEvent.target.result);
+        reader.readAsText(event.dataTransfer.files[0]);
+      }
+
+      function loadData(rawData) {
+        json = JSON.parse(rawData);
+
+        update();
+      }
+
+      var group = "ASIL";
+      toggleGroup = {
+        ASIL: "ORIGIN",
+        ORIGIN: "ASIL",
+      };
+      var root = 0;
+      toggleRoot = {
+        0: 1,
+        1: 0,
+      };
+      function update() {
+        dounatBars.loadData(json.children[root].children, json.groups[group]);
+        group = toggleGroup[group];
+        root = toggleRoot[root];
+      }
+    </script>
+  </body>
+</html>
